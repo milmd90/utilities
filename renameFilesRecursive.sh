@@ -17,91 +17,39 @@ else
 	echo Moved to $PWD
 fi
 
+if [[ "$4" == "" ]]; then
+	echo "Error: Missing number of levels to search"
+	exit
+fi
+
+find="$1"
+replace="$2"
+numLevels="$4"
 echo Updating $1 "=>" $2
 
-set -e
-for item1 in *; do
+check() {
+	#echo "checking" $1 $2 $3
 
-	nextItem=$item1
-	if [[ "$item1" == "$1"* ]]; then
-		# string replace
-		nextItem=${item1/$1/$2}
-		echo "1" $item1 "=>" "$nextItem"
-		mv "$item1" "$nextItem"
-	fi
+	for item1 in *; do
 
-	#echo 1 nextItem "$nextItem"
+		nextItem=$item1
+		if [[ "$item1" == "$1"* ]]; then
+			# string replace
+			nextItem=${item1/$1/$2}
+			echo "1" $item1 "=>" "$nextItem"
+			mv "$item1" "$nextItem"
+		fi
 
-	if [[ -d "$nextItem" ]] && [[ "$nextItem" != *".logicx/" ]]; then
-		cd "$nextItem"
-		for item2 in *; do
+		nextLevel=$(($3-1))
+		#echo nextLevel "$nextLevel" nextItem "$nextItem"
+		if [[ "$nextLevel" -gt 0 ]] && [[ -d "$nextItem" ]] && [[ "$nextItem" != *".logicx/" ]]; then
+			cd "$nextItem"
 
-			nextItem=$item2
-			if [[ "$item2" == $1* ]]; then
-				# string replace
-				nextItem=${item2/$1/$2}
-				echo "2  " $item2 "=>" "$nextItem"
-				mv "$item2" "$nextItem"
-			fi
+			check "$find" "$replace" $(($3-1))
 
-			#echo 2 nextItem "$nextItem"
+			cd ..
+		fi
+	done
+}
 
-			if [[ -d "$nextItem" ]] && [[ "$nextItem" != *".logicx/" ]]; then
-				cd "$nextItem"
-				for item3 in *; do
-
-					nextItem=$item3
-					if [[ "$item3" == $1* ]]; then
-						# string replace
-						nextItem=${item3/$1/$2}
-						echo "3   " $item3 "=>" "$nextItem"
-						mv "$item3" "$nextItem"
-					fi
-
-					#echo 3 nextItem "$nextItem"
-
-					if [[ -d "$nextItem" ]] && [[ "$nextItem" != *".logicx/" ]]; then
-						cd "$nextItem"
-						for item4 in *; do
-
-							nextItem=$item4
-							if [[ "$item4" == $1* ]]; then
-								# string replace
-								nextItem=${item4/$1/$2}
-								echo "4    " $item4 "=>" "$nextItem"
-								mv "$item4" "$nextItem"
-							fi
-
-							#echo 4 nextItem "$nextItem"
-
-							if [[ -d "$nextItem" ]] && [[ "$nextItem" != *".logicx/" ]]; then
-								cd "$nextItem"
-								for item5 in *; do
-
-									nextItem=$item5
-									if [[ "$item5" == $1* ]]; then
-										# string replace
-										nextItem=${item5/$1/$2}
-										echo "5     " $item5 "=>" "$nextItem"
-										mv "$item5" "$nextItem"
-									fi
-
-									#echo 5 nextItem "$nextItem"
-
-								done
-								cd ..
-							fi
-
-						done
-						cd ..
-					fi
-
-				done
-				cd ..
-			fi
-
-		done
-		cd ..
-	fi
-
-done
+check "$find" "$replace" "$numLevels"
