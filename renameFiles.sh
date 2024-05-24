@@ -22,6 +22,15 @@ if [[ "$4" == "" ]]; then
 	exit
 fi
 
+isDryRun=true
+if [[ "$5" != "execute" ]]; then
+        echo "Dry run"
+else 
+	echo "EXECUTING"
+	isDryRun=false
+fi
+
+
 find="$1"
 replace="$2"
 numLevels="$4"
@@ -36,13 +45,15 @@ check() {
 		if [[ "$item1" == "$1"* ]]; then
 			# string replace
 			nextItem=${item1/$1/$2}
-			echo "1" $item1 "=>" "$nextItem"
-			mv "$item1" "$nextItem"
+			echo "Renaming:" $item1 "=>" "$nextItem"
+			if [[ !$isDryRun ]]; then
+				mv "$item1" "$nextItem"
+			fi
 		fi
 
 		nextLevel=$(($3-1))
 		#echo nextLevel "$nextLevel" nextItem "$nextItem"
-		if [[ "$nextLevel" -gt 0 ]] && [[ -d "$nextItem" ]] && [[ "$nextItem" != *".logicx/" ]]; then
+		if [[ "$nextLevel" -gt 0 ]] && [[ -d "$nextItem" ]] && [[ "$nextItem" != *".logicx" ]] && [[ "$nextItem" != *".logicx/" ]]; then
 			cd "$nextItem"
 
 			check "$find" "$replace" $(($3-1))
