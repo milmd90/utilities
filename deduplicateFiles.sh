@@ -16,13 +16,16 @@ else
 	isDryRun=false
 fi
 
+counter=0
 check() {
 	for item in *; do
     remove=" (1)"
 		original="${item//$remove}"
 	  # echo "checking:" $item $original
 		if [[ "$item" == *$remove* ]] && [[ -f "./$original" ]]; then
-			echo "found:" $item $original
+			echo "duplicates:" $item $original
+			echo "rm " $item
+			((counter++))
 			if [[ $isDryRun == false ]]; then
 				rm "$item"
 			fi
@@ -39,3 +42,6 @@ check() {
 }
 
 check
+
+
+echo "total duplicates:" $counter
