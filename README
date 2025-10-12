@@ -1,3 +1,4 @@
+# Rename Files
 
 This program searches for files and directories to rename
 Files have to match starting with the "find" argument and the matching 
@@ -10,3 +11,5 @@ find: the string to sarch for
 replace: the string to replace it with
 start: the starting directory
 levels: the number of subdirectories to search
+
+# Deduplicate Files
